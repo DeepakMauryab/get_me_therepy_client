@@ -5,11 +5,6 @@ const emailRegex =
 export const confirmPassMessage = 'New Password & Confirm Password must match';
 
 const Validation = {
-  mobileNumber: {
-    required: 'Enter Your Mobile Number',
-    maxLength: {value: 10, message: 'Enter Correct Mobile Number'},
-    minLength: {value: 10, message: 'Enter Correct Mobile Number'},
-  },
   password: {
     required: 'Enter Password',
     pattern: {

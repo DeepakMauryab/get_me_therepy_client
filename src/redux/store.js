@@ -7,6 +7,7 @@ import Fetcher from '../services/Services';
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
+  blacklist: ['api'],
 };
 
 const rootReducer = combineReducers({
@@ -18,8 +19,8 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const Store = configureStore({
   reducer: persistedReducer,
-  // middleware: getDefaultMiddleware =>
-  //   getDefaultMiddleware().concat([Fetcher.reducerPath].middleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware().concat(Fetcher.middleware),
 });
 
 export default Store;

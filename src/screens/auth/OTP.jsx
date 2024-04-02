@@ -20,13 +20,15 @@ import Font from '../../constants/fonts';
 import Feather from 'react-native-vector-icons/Feather';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import {useResetPasswordMutation} from '../../services/Services';
+import LottieView from 'lottie-react-native';
+import assets from '../../assets';
 
 const OTP = ({navigation, route}) => {
   const [timer, setTimer] = useState(10);
   const [otp, setOtp] = useState(0);
   const [getOTP, setGetOTP] = useState(route.params.otp);
   const [showAlert, setShowAlert] = useState(false);
-  const [resetPassword] = useResetPasswordMutation();
+  const [resetPassword, response] = useResetPasswordMutation();
   const otpHandler = () => {
     if (otp !== getOTP) {
       setShowAlert(true);
@@ -109,17 +111,34 @@ const OTP = ({navigation, route}) => {
         ) : (
           timerShow
         )}
-        <TouchableOpacity
-          disabled={otp.length !== 4}
-          onPress={otpHandler}
-          activeOpacity={0.8}
-          style={[
-            styles.button,
-            styles.mt10,
-            {opacity: otp.length !== 4 ? 0.5 : 1},
-          ]}>
-          <Text style={styles.buttonText}>Continue</Text>
-        </TouchableOpacity>
+
+        {response.isLoading ? (
+          <View
+            style={{
+              height: 50,
+              width: '90%',
+              alignSelf: 'center',
+            }}>
+            <LottieView
+              source={assets.btn_loader}
+              style={{width: '100%', height: '100%'}}
+              autoPlay
+              loop
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            disabled={otp.length !== 4}
+            onPress={otpHandler}
+            activeOpacity={0.8}
+            style={[
+              styles.button,
+              styles.mt10,
+              {opacity: otp.length !== 4 ? 0.5 : 1},
+            ]}>
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        )}
         <AwesomeAlert
           show={showAlert}
           showProgress={false}

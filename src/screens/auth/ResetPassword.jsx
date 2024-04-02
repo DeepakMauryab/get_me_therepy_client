@@ -4,6 +4,7 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -15,10 +16,12 @@ import Validation, {confirmPassMessage} from '../../constants/Validation';
 import Screens from '../../constants/screens';
 import {heightPercentageToDP} from 'react-native-responsive-screen';
 import {useResetPasswordConfirmMutation} from '../../services/Services';
+import LottieView from 'lottie-react-native';
+import assets from '../../assets';
 
 const ResetPassword = ({navigation, route}) => {
   const {control, getValues, handleSubmit, watch} = useForm();
-  const [resetPasswordConfirm] = useResetPasswordConfirmMutation();
+  const [resetPasswordConfirm, response] = useResetPasswordConfirmMutation();
   const loginHandler = async () => {
     const {password} = getValues();
     const res = await resetPasswordConfirm({
@@ -64,12 +67,28 @@ const ResetPassword = ({navigation, route}) => {
           }}
         />
 
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleSubmit(loginHandler)}
-          style={[styles.button, {marginTop: heightPercentageToDP(10)}]}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+        {response.isLoading ? (
+          <View
+            style={{
+              height: 50,
+              width: '90%',
+              alignSelf: 'center',
+            }}>
+            <LottieView
+              source={assets.btn_loader}
+              style={{width: '100%', height: '100%'}}
+              autoPlay
+              loop
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleSubmit(loginHandler)}
+            style={[styles.button, {marginTop: heightPercentageToDP(10)}]}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

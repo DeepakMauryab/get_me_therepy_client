@@ -1,11 +1,4 @@
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Dimensions, Image, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useImperativeHandle} from 'react';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
@@ -28,7 +21,7 @@ const {height: SCREEN_HEIGHT} = Dimensions.get('window');
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50;
 
 const BottomSheet = React.forwardRef(
-  ({children, heading, para, btnText, onButtonPress}, ref) => {
+  ({heading, para, btnText, onButtonPress}, ref) => {
     const translateY = useSharedValue(0);
     const active = useSharedValue(false);
 

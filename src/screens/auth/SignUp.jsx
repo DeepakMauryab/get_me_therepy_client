@@ -21,7 +21,19 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import Font from '../../constants/fonts';
 import FontSize from '../../constants/FontSize';
 import {useDispatch} from 'react-redux';
-import {useCreateUserMutation} from '../../services/Services';
+import {
+  useCreateEventMutation,
+  useCreateUserMutation,
+  useGoogleAuthMutation,
+} from '../../services/Services';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import LottieView from 'lottie-react-native';
+import assets from '../../assets';
+
+GoogleSignin.configure({
+  webClientId:
+    '155533693467-voc18cs25vgga9fkh3jtnfe7195t9mer.apps.googleusercontent.com',
+});
 
 const SignUp = ({navigation}) => {
   const {control, handleSubmit, getValues} = useForm();
@@ -29,7 +41,12 @@ const SignUp = ({navigation}) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [createUser] = useCreateUserMutation();
+
+  // rtk queries
+  const [createUser, response1] = useCreateUserMutation();
+  const [googleAuth, response2] = useGoogleAuthMutation();
+  const [createEvent, response3] = useCreateEventMutation();
+
   const loginHandler = async () => {
     if (!toggleCheckBox) {
       setAcceptPrivacy(true);
@@ -37,12 +54,30 @@ const SignUp = ({navigation}) => {
     }
     const {email, username, password} = getValues();
     const res = await createUser({email, username, password});
-
     if (res?.data?.success) {
+      addEvent(username, email);
       setUserDataWithSuccess(res.data?.newCustomer, navigation, dispatch);
     } else if (res.error?.status === 400) {
       setShowAlert(true);
     }
+  };
+  const googleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const {email, name: username} = userInfo.user;
+      const res = await googleAuth({email, username});
+      if (res?.data?.success) {
+        addEvent(username, email);
+        setUserDataWithSuccess(res?.data?.data?.customer, navigation, dispatch);
+      }
+    } catch (error) {
+      Alert.alert('Something Went Wrong');
+    }
+  };
+
+  const addEvent = async (username, email) => {
+    const res = await createEvent({username, email});
   };
   return (
     <SafeAreaView>
@@ -104,18 +139,53 @@ const SignUp = ({navigation}) => {
           </Text>
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleSubmit(loginHandler)}
-          style={[styles.button, styles.mt2]}>
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
+        {response1.isLoading || response3.isLoading ? (
+          <View
+            style={{
+              height: 50,
+              width: '90%',
+              alignSelf: 'center',
+            }}>
+            <LottieView
+              source={assets.btn_loader}
+              style={{width: '100%', height: '100%'}}
+              autoPlay
+              loop
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleSubmit(loginHandler)}
+            style={[styles.button, styles.mt2]}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+        )}
 
         <TextOnLine text={'Or sign in with'} />
 
-        <TouchableOpacity activeOpacity={0.8} style={{alignSelf: 'center'}}>
-          <Image source={require('../../assets/icons/google.png')} />
-        </TouchableOpacity>
+        {response2.isLoading ? (
+          <View
+            style={{
+              height: 50,
+              width: '90%',
+              alignSelf: 'center',
+            }}>
+            <LottieView
+              source={assets.btn_loader}
+              style={{width: '100%', height: '100%'}}
+              autoPlay
+              loop
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={googleLogin}
+            activeOpacity={0.8}
+            style={{alignSelf: 'center'}}>
+            <Image source={require('../../assets/icons/google.png')} />
+          </TouchableOpacity>
+        )}
         <View style={[styles.mv3, styles.flexRow, styles.xCenter]}>
           <Text style={styles.dontHaveAccount}>Have an account? </Text>
           <Text

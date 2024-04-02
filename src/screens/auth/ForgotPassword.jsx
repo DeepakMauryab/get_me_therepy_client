@@ -1,4 +1,10 @@
-import {ScrollView, StatusBar, Text, TouchableOpacity} from 'react-native';
+import {
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Colors from '../../constants/colors';
@@ -11,11 +17,13 @@ import FontSize from '../../constants/FontSize';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Font from '../../constants/fonts';
 import {useResetPasswordMutation} from '../../services/Services';
+import assets from '../../assets';
+import LottieView from 'lottie-react-native';
 
 const ForgotPassword = ({navigation}) => {
   const {control, handleSubmit, getValues} = useForm();
   const [showAlert, setShowAlert] = useState(false);
-  const [resetPassword] = useResetPasswordMutation();
+  const [resetPassword, response] = useResetPasswordMutation();
 
   const forgotHandler = async () => {
     const {email} = getValues();
@@ -51,12 +59,29 @@ const ForgotPassword = ({navigation}) => {
           label="Email Address"
           rules={Validation.email}
         />
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleSubmit(forgotHandler)}
-          style={[styles.button, styles.mt10]}>
-          <Text style={styles.buttonText}>Continue</Text>
-        </TouchableOpacity>
+        {response.isLoading ? (
+          <View
+            style={{
+              height: 50,
+              width: '90%',
+              alignSelf: 'center',
+            }}>
+            <LottieView
+              source={assets.btn_loader}
+              style={{width: '100%', height: '100%'}}
+              autoPlay
+              loop
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleSubmit(forgotHandler)}
+            style={[styles.button, styles.mt10]}>
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        )}
+
         <AwesomeAlert
           show={showAlert}
           showProgress={false}

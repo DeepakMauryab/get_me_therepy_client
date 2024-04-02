@@ -3,7 +3,7 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 const Fetcher = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/v1/',
+    baseUrl: 'https://get-me-therepy-server.onrender.com/api/v1/',
   }),
   endpoints: builder => ({
     resetPassword: builder.mutation({
@@ -41,6 +41,13 @@ const Fetcher = createApi({
         body,
       }),
     }),
+    createEvent: builder.mutation({
+      query: body => ({
+        url: `event`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -51,4 +58,5 @@ export const {
   useLoginUserMutation,
   useResetPasswordConfirmMutation,
   useGoogleAuthMutation,
+  useCreateEventMutation,
 } = Fetcher;
